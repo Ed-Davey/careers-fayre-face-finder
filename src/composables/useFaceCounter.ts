@@ -87,6 +87,10 @@ export function useFaceCounter() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
     context.scale(dpr, dpr);
+    // The preview is mirrored for a natural, mirror-like camera view. Mirror
+    // the detection overlay too so its boxes stay aligned with the displayed faces.
+    context.translate(width, 0);
+    context.scale(-1, 1);
     context.strokeStyle = '#d5ff67';
     context.lineWidth = 2.5;
     context.shadowColor = 'rgba(0,0,0,.25)';
