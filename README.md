@@ -106,7 +106,7 @@ docker compose up --build
 
 Open <http://localhost:8080> and allow camera access when prompted. Press `Ctrl+C` to stop the server; run `docker compose down` to remove the stopped container. The first build needs internet access to install npm packages and fetch the face detector model. Once built, the container serves the app and detector assets locally. The browser uses the computer's camera; the container does not need direct camera-device access.
 
-### Run an app image from Docker Hub
+## Run an app image from Docker Hub
 
 These steps are for each tester. They need Docker Desktop (or another running Docker Engine) and a browser on the same computer.
 
