@@ -83,6 +83,7 @@ flowchart TD
 ## Requirements
 
 - Node.js 20 or newer and npm.
+- Docker Desktop or another Docker Engine with Docker Compose, if using the container workflow.
 - A current browser with camera support (use the intended MacBook and browser for the event check).
 - Camera permission and a consenting participant-facing camera position.
 
@@ -94,6 +95,38 @@ npm run build
 ```
 
 The build preparation step copies the MediaPipe WASM runtime from `node_modules` and downloads the BlazeFace full-range model into `public/vision/`. This initial preparation needs internet access. The generated assets are ignored by Git; repeat `npm run build` after a fresh checkout. The app pins MediaPipe Tasks Vision 1.0.1. Once prepared and built, the app's runtime loads its JavaScript, WASM, and model from the same origin.
+
+## Run with Docker
+
+Docker builds the app and detector assets into an image, then serves the static site locally. Start Docker Desktop first, then run:
+
+```sh
+docker compose up --build
+```
+
+Open <http://localhost:8080> and allow camera access when prompted. Press `Ctrl+C` to stop the server; run `docker compose down` to remove the stopped container. The first build needs internet access to install npm packages and fetch the face detector model. Once built, the container serves the app and detector assets locally. The browser uses the computer's camera; the container does not need direct camera-device access.
+
+### Run an app image from Docker Hub
+
+These steps are for each tester. They need Docker Desktop (or another running Docker Engine) and a browser on the same computer.
+
+1. Open Docker Desktop and wait for it to finish starting.
+2. Open a terminal and download the image. Replace `eddavey` with the publisher's Docker ID:
+
+   ```sh
+   docker pull eddavey/careers-fayre-face-counter:latest
+   ```
+
+3. Start the app:
+
+   ```sh
+   docker run --rm -p 127.0.0.1:8080:80 eddavey/careers-fayre-face-counter:latest
+   ```
+
+4. In a browser on that same computer, open <http://localhost:8080> and allow camera access when prompted. The camera stays on that computer; the container only serves the app files.
+5. When finished, return to the terminal and press `Ctrl+C` to stop the app.
+
+Docker Hub distributes the image; it does not provide a normal website link to open. Testers must download the image before going offline. After the download, the app can run locally without internet access. If port `8080` is already in use, replace `8080` in both the run command and the browser address with another available port, such as `8081`.
 
 ## Run locally (including offline at the event)
 
