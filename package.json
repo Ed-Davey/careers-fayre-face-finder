@@ -1,0 +1,22 @@
+{
+  "name": "careers-fayre-face-counter",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "prepare:vision": "node scripts/prepare-vision-assets.mjs",
+    "build": "npm run prepare:vision && vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "1.0.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.5",
+    "vue-tsc": "^2.2.0"
+  }
+}
