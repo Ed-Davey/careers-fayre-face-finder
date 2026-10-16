@@ -31,7 +31,7 @@ button { font: inherit; }
 .screen-surface { position: absolute; z-index: 5; overflow: hidden; background: #111; }
 .is-scene-transitioning .screen-surface { transition: left .45s cubic-bezier(.22,.61,.36,1), top .45s cubic-bezier(.22,.61,.36,1), width .45s cubic-bezier(.22,.61,.36,1), height .45s cubic-bezier(.22,.61,.36,1), transform .45s cubic-bezier(.22,.61,.36,1); }
 .screen-surface video, .screen-surface canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.screen-surface video { object-fit: cover; }
+.screen-surface video { object-fit: cover; transform: scaleX(-1); }
 .screen-surface canvas { z-index: 2; pointer-events: none; }
 .screen-surface video[style*="display: none"], .screen-surface canvas[style*="display: none"] { display: none !important; }
 .screen-standby { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px; background: #172b25; color: #e6efdc; font-size: clamp(7px, 1vw, 12px); text-align: center; }

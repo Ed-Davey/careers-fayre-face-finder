@@ -80,9 +80,45 @@ flowchart TD
 
 `Default` is a still scene for explaining the demo. Other backgrounds rotate every 7.5 seconds. Each background's viewport corners are percentages in `src/data/scenes.ts`, so those values determine where and how the camera preview is projected.
 
+## Security and data flow
+
+The camera image and MediaPipe telemetry follow separate paths:
+
+### Camera image: processed in the browser
+
+```mermaid
+flowchart LR
+    Permission["User grants camera permission"] --> Camera["Camera stream<br/>video only; no audio"]
+    Camera --> Frames["Live frames in browser memory"]
+    Runtime["MediaPipe Tasks Vision<br/>locally served runtime"] --> API["FaceDetector API"]
+    Model["BlazeFace full-range model<br/>locally served"] --> Detector["BlazeFace inference<br/>runs in browser"]
+    Frames -->|about every 300 ms| API
+    API --> Detector
+    Detector -->|face locations and confidence| Results["Temporary detection results"]
+    Results --> Count["Current face count"]
+    Results --> Boxes["Draw boxes on canvas"]
+    Frames --> Viewport["Visible camera viewport"]
+    Boxes --> Viewport
+```
+
+The app processes camera frames in the browser. It does not upload the frames or face boxes to an application server or Google, identify people, or save the images or detections. The count is a live estimate of faces in each processed frame, not a count of unique visitors.
+
+### Usage information: sent to Google
+
+```mermaid
+flowchart LR
+    SDK["MediaPipe Tasks Vision 1.0.1"] --> Metrics["Usage and performance summary<br/>FaceDetector · VIDEO · SDK version<br/>broad OS family · inference totals/timings"]
+    Metrics -->|HTTPS POST| Google["Google logging service<br/>odml.pa.googleapis.com"]
+```
+
+The SDK sends aggregate usage and performance metrics to Google. **This payload does not contain camera images, video frames, face boxes, or the face count displayed by the app.** The request itself does reveal ordinary connection metadata to Google, such as the source IP address and when the request arrived. The Docker setup serves the app and model from the same computer, but does not prevent this separate telemetry request.
+
+See [Third-party notices](THIRD_PARTY_NOTICES.md) for detailed diagrams, component roles, telemetry behavior, and privacy implications.
+
 ## Requirements
 
 - Node.js 20 or newer and npm.
+- Docker Desktop or another Docker Engine with Docker Compose, if using the container workflow.
 - A current browser with camera support (use the intended MacBook and browser for the event check).
 - Camera permission and a consenting participant-facing camera position.
 
@@ -94,6 +130,38 @@ npm run build
 ```
 
 The build preparation step copies the MediaPipe WASM runtime from `node_modules` and downloads the BlazeFace full-range model into `public/vision/`. This initial preparation needs internet access. The generated assets are ignored by Git; repeat `npm run build` after a fresh checkout. The app pins MediaPipe Tasks Vision 1.0.1. Once prepared and built, the app's runtime loads its JavaScript, WASM, and model from the same origin.
+
+## Run with Docker
+
+Docker builds the app and detector assets into an image, then serves the static site locally. Start Docker Desktop first, then run:
+
+```sh
+docker compose up --build
+```
+
+Open <http://localhost:8080> and allow camera access when prompted. Press `Ctrl+C` to stop the server; run `docker compose down` to remove the stopped container. The first build needs internet access to install npm packages and fetch the face detector model. Once built, the container serves the app and detector assets locally. The browser uses the computer's camera; the container does not need direct camera-device access.
+
+## Run an app image from Docker Hub
+
+These steps are for each tester. They need Docker Desktop (or another running Docker Engine) and a browser on the same computer.
+
+1. Open Docker Desktop and wait for it to finish starting.
+2. Open a terminal and download the image. Replace `eddavey` with the publisher's Docker ID:
+
+   ```sh
+   docker pull eddavey/careers-fayre-face-counter:latest
+   ```
+
+3. Start the app:
+
+   ```sh
+   docker run --rm -p 127.0.0.1:8080:80 eddavey/careers-fayre-face-counter:latest
+   ```
+
+4. In a browser on that same computer, open <http://localhost:8080> and allow camera access when prompted. The camera stays on that computer; the container only serves the app files.
+5. When finished, return to the terminal and press `Ctrl+C` to stop the app.
+
+Docker Hub distributes the image; it does not provide a normal website link to open. Testers must download the image before going offline. After the download, the app can run locally without internet access. If port `8080` is already in use, replace `8080` in both the run command and the browser address with another available port, such as `8081`.
 
 ## Run locally (including offline at the event)
 
