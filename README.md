@@ -80,6 +80,41 @@ flowchart TD
 
 `Default` is a still scene for explaining the demo. Other backgrounds rotate every 7.5 seconds. Each background's viewport corners are percentages in `src/data/scenes.ts`, so those values determine where and how the camera preview is projected.
 
+## Security and data flow
+
+The camera image and MediaPipe telemetry follow separate paths:
+
+### Camera image: processed in the browser
+
+```mermaid
+flowchart LR
+    Permission["User grants camera permission"] --> Camera["Camera stream<br/>video only; no audio"]
+    Camera --> Frames["Live frames in browser memory"]
+    Runtime["MediaPipe Tasks Vision<br/>locally served runtime"] --> API["FaceDetector API"]
+    Model["BlazeFace full-range model<br/>locally served"] --> Detector["BlazeFace inference<br/>runs in browser"]
+    Frames -->|about every 300 ms| API
+    API --> Detector
+    Detector -->|face locations and confidence| Results["Temporary detection results"]
+    Results --> Count["Current face count"]
+    Results --> Boxes["Draw boxes on canvas"]
+    Frames --> Viewport["Visible camera viewport"]
+    Boxes --> Viewport
+```
+
+The app processes camera frames in the browser. It does not upload the frames or face boxes to an application server or Google, identify people, or save the images or detections. The count is a live estimate of faces in each processed frame, not a count of unique visitors.
+
+### Usage information: sent to Google
+
+```mermaid
+flowchart LR
+    SDK["MediaPipe Tasks Vision 1.0.1"] --> Metrics["Usage and performance summary<br/>FaceDetector · VIDEO · SDK version<br/>broad OS family · inference totals/timings"]
+    Metrics -->|HTTPS POST| Google["Google logging service<br/>odml.pa.googleapis.com"]
+```
+
+The SDK sends aggregate usage and performance metrics to Google. **This payload does not contain camera images, video frames, face boxes, or the face count displayed by the app.** The request itself does reveal ordinary connection metadata to Google, such as the source IP address and when the request arrived. The Docker setup serves the app and model from the same computer, but does not prevent this separate telemetry request.
+
+See [Third-party notices](THIRD_PARTY_NOTICES.md) for detailed diagrams, component roles, telemetry behavior, and privacy implications.
+
 ## Requirements
 
 - Node.js 20 or newer and npm.
