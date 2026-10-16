@@ -2,6 +2,13 @@
 
 This file identifies the third-party components used for face detection and explains what happens to camera data. It describes the application code and bundled assets; it is not a substitute for the event organiser's privacy notice or legal review.
 
+## Space Grotesk font
+
+- Font: Space Grotesk variable, Latin subset, bundled at `src/assets/fonts/space-grotesk-latin-wght-normal.woff2` and loaded locally by `src/styles.css`.
+- Copyright: Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk).
+- License: SIL Open Font License 1.1. The license text is included at `public/fonts/OFL.txt` and is served with the built app.
+- Source: [Space Grotesk on GitHub](https://github.com/floriankarsten/space-grotesk).
+
 ## MediaPipe Tasks Vision
 
 - Package: [`@mediapipe/tasks-vision`](https://www.npmjs.com/package/@mediapipe/tasks-vision), version 1.0.1 (the version pinned in `package.json`).

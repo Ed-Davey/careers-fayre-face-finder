@@ -4,6 +4,7 @@ import { useFaceCounter } from './composables/useFaceCounter';
 import SceneSelector from './components/SceneSelector.vue';
 import PhotoCredits from './components/PhotoCredits.vue';
 import { customScenes, scenes, type Point, type Scene } from './data/scenes';
+import saltoLogo from '../images/Salto_Claim_Multicolour_Neg_Logo_RGB.svg';
 const sceneDurationMs = 7_500;
 
 const selectedSceneId = ref('default');
@@ -188,6 +189,8 @@ function startSceneTransition() {
 <template>
   <div class="app-shell">
     <header class="topbar">
+      <img class="topbar-logo" :src="saltoLogo" alt="Salto" />
+      <span class="topbar-separator" aria-hidden="true">|</span>
       <h1>Careers fayre face counter</h1>
     </header>
     <main class="main-content">
