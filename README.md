@@ -146,7 +146,7 @@ Open <http://localhost:8080> and allow camera access when prompted. Press `Ctrl+
 These steps are for each tester. They need Docker Desktop (or another running Docker Engine) and a browser on the same computer.
 
 1. Open Docker Desktop and wait for it to finish starting.
-2. Open a terminal and download the image. Replace `eddavey` with the publisher's Docker ID:
+2. Open a terminal and download the image.
 
    ```sh
    docker pull eddavey/careers-fayre-face-counter:latest
@@ -161,7 +161,7 @@ These steps are for each tester. They need Docker Desktop (or another running Do
 4. In a browser on that same computer, open <http://localhost:8080> and allow camera access when prompted. The camera stays on that computer; the container only serves the app files.
 5. When finished, return to the terminal and press `Ctrl+C` to stop the app.
 
-Docker Hub distributes the image; it does not provide a normal website link to open. Testers must download the image before going offline. After the download, the app can run locally without internet access. If port `8080` is already in use, replace `8080` in both the run command and the browser address with another available port, such as `8081`.
+Docker Hub distributes the image; it does not provide a normal website link to open. Testers must download the image before going offline. After the download, the app files and face detection can run locally without internet access. MediaPipe's separate telemetry requests cannot reach Google while the computer is offline. If port `8080` is already in use, replace `8080` in both the run command and the browser address with another available port, such as `8081`.
 
 ## Run locally (including offline at the event)
 
@@ -185,9 +185,9 @@ To check offline launch, complete setup and build first, turn Wi-Fi off, then st
 
 ## Privacy and operation
 
-Detection runs in this browser on this Mac. Video frames are analysed in memory and discarded; nothing is recorded, uploaded, logged, or retained by this app. Do not aim the camera at anyone who has not consented. A face may not be counted when turned away, hidden, outside the frame, or missed by the detector. This notice describes app behaviour and is not a claim of GDPR compliance.
+Detection runs in the browser on this computer. Camera frames and per-frame face detections are processed in memory; the app does not record or upload them to an application server or Google. MediaPipe separately sends aggregate usage and performance metrics to Google, as described in [Security and data flow](#security-and-data-flow). Tell people about the camera before using it, and do not aim it at anyone who has not consented. A face may not be counted when turned away, hidden, outside the frame, or missed by the detector. This notice describes app behaviour and is not a claim of GDPR compliance.
 
-The app requests no microphone, has no backend, analytics, telemetry, database, identity matching, face enrolment, age or emotion estimates, or network API. At runtime, Vite Preview serves the JavaScript, MediaPipe WASM, and model from this computer.
+The app requests no microphone and has no first-party backend or database, identity matching, face enrolment, age estimates, or emotion estimates. The pinned MediaPipe SDK does send telemetry to Google; the app code has no telemetry opt-out. At runtime, Vite Preview serves the app JavaScript, MediaPipe WASM, and model from this computer, but that does not prevent the SDK's separate telemetry request.
 
 ## License notes
 
