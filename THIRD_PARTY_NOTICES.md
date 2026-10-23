@@ -9,6 +9,13 @@ This file identifies the third-party components used for face detection and expl
 - License: SIL Open Font License 1.1. The license text is included at `public/fonts/OFL.txt` and is served with the built app.
 - Source: [Space Grotesk on GitHub](https://github.com/floriankarsten/space-grotesk).
 
+## Technology logos
+
+- Source: [Simple Icons 13.21.0](https://github.com/simple-icons/simple-icons/tree/13.21.0).
+- The SVG technology logos in `public/technology/` are served locally for the always-visible **Built with** section.
+- License: CC0 1.0 Universal. The upstream license is included at [public/technology/LICENSE.md](public/technology/LICENSE.md).
+- Brand names and marks belong to their respective owners; inclusion does not imply endorsement. Brand usage guidelines still apply.
+
 ## MediaPipe Tasks Vision
 
 - Package: [`@mediapipe/tasks-vision`](https://www.npmjs.com/package/@mediapipe/tasks-vision), version 1.0.1 (the version pinned in `package.json`).

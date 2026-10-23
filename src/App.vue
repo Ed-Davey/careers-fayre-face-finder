@@ -3,6 +3,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch, type CSSPropert
 import { useFaceCounter } from './composables/useFaceCounter';
 import SceneSelector from './components/SceneSelector.vue';
 import PhotoCredits from './components/PhotoCredits.vue';
+import AboutDemo from './components/AboutDemo.vue';
+import BuiltWith from './components/BuiltWith.vue';
 import { customScenes, scenes, type Point, type Scene } from './data/scenes';
 import saltoLogo from '../images/Salto_Claim_Multicolour_Neg_Logo_RGB.svg';
 const sceneDurationMs = 7_500;
@@ -32,6 +34,12 @@ const {
 } = useFaceCounter();
 
 const selectedScene = computed(() => scenes.find((scene) => scene.id === selectedSceneId.value) ?? scenes[0]);
+const cameraCanStop = computed(() => ['requesting', 'loading', 'active'].includes(state.value));
+const standbyTitle = computed(() => {
+  if (state.value === 'requesting') return 'Camera permission needed';
+  if (state.value === 'error') return 'Camera unavailable';
+  return 'Camera off';
+});
 const sceneCaption = computed(() => {
   const count = faceCount.value ?? 0;
   const people = `${count} ${count === 1 ? 'person' : 'people'}`;
@@ -189,9 +197,11 @@ function startSceneTransition() {
 <template>
   <div class="app-shell">
     <header class="topbar">
-      <img class="topbar-logo" :src="saltoLogo" alt="Salto" />
+      <a href="https://saltosystems.com/en/products/face-recognition-terminals/xs4-face/" target="_blank" rel="noopener noreferrer" aria-label="Explore Salto XS4 Face (opens in a new tab)">
+        <img class="topbar-logo" :src="saltoLogo" alt="Salto" />
+      </a>
       <span class="topbar-separator" aria-hidden="true">|</span>
-      <h1>Careers fayre face counter</h1>
+      <h1>Face Counter</h1>
     </header>
     <main class="main-content">
       <section class="demo-grid" aria-label="Live face counter">
@@ -227,8 +237,7 @@ function startSceneTransition() {
             />
             <canvas ref="canvasElement" v-show="cameraIsVisible" aria-hidden="true" />
             <div v-if="!cameraIsVisible && selectedScene.image" class="screen-standby">
-              <span class="screen-standby-dot" />
-              <span>Camera off · Start when ready</span>
+              <span>{{ standbyTitle }}</span>
             </div>
           </div>
 
@@ -237,16 +246,18 @@ function startSceneTransition() {
             class="standby"
             :class="{ 'scene-matte': selectedScene.image }"
           >
-            <div class="standby-illustration" aria-hidden="true">
-              <svg viewBox="0 0 80 80" fill="none">
-                <rect x="12" y="22" width="56" height="40" rx="8" />
-                <path d="M27 22l5-8h16l5 8" />
-                <circle cx="40" cy="42" r="12" />
-                <circle class="lens-core" cx="40" cy="42" r="5" />
-              </svg>
-            </div>
-            <h2>{{ state === 'error' ? 'Ready to try again' : state === 'requesting' ? 'Camera permission needed' : 'Ready for the first face' }}</h2>
-            <p>{{ state === 'requesting' ? 'Allow camera access in your browser to begin.' : 'Start the camera when everyone is ready.' }}</p>
+            <template v-if="!cameraIsVisible">
+              <div class="standby-illustration" aria-hidden="true">
+                <svg viewBox="0 0 80 80" fill="none">
+                  <rect x="12" y="22" width="56" height="40" rx="8" />
+                  <path d="M27 22l5-8h16l5 8" />
+                  <circle cx="40" cy="42" r="12" />
+                  <circle class="lens-core" cx="40" cy="42" r="5" />
+                </svg>
+              </div>
+              <h2>{{ standbyTitle }}</h2>
+              <p>{{ state === 'requesting' ? 'Allow camera access in your browser to begin.' : state === 'error' ? 'Check the message below, then try again.' : 'Click "Start camera" to begin.' }}</p>
+            </template>
           </div>
 
           <span class="frame-corner corner-tl" aria-hidden="true" />
@@ -254,7 +265,7 @@ function startSceneTransition() {
           <span class="frame-corner corner-bl" aria-hidden="true" />
           <span class="frame-corner corner-br" aria-hidden="true" />
 
-          <div v-if="state === 'active'" class="live-indicator"><span /> LIVE PREVIEW</div>
+          <div v-if="state === 'active'" class="live-indicator"><span /> LIVE</div>
           <div class="status-pill" :data-state="state" role="status">
             <span class="status-dot" />
             {{ statusTitle }}
@@ -265,7 +276,7 @@ function startSceneTransition() {
         <aside class="count-panel" :data-band="countBand" aria-live="polite" aria-atomic="true">
           <div class="count-topline">
             <span class="count-spark" aria-hidden="true">✳</span>
-            <span>LIVE COUNT</span>
+            <span>{{ state === 'active' ? 'LIVE COUNT' : 'FACE COUNT' }}</span>
           </div>
           <div class="count-number-wrap">
             <Transition name="count-pop" mode="out-in">
@@ -283,31 +294,23 @@ function startSceneTransition() {
       <SceneSelector :scenes="scenes" :selected-scene-id="selectedSceneId" @select="selectedSceneId = $event" />
 
       <section class="control-row" aria-label="Camera controls">
-        <div class="control-copy">
-          <p class="status-detail">{{ statusDetail }}</p>
-          <p class="privacy-note">On-device only · Frames are analysed in memory and immediately discarded.</p>
-        </div>
+        <BuiltWith />
         <div class="button-row">
           <button
-            class="button button-start"
+            class="button"
+            :class="cameraCanStop ? 'button-stop' : 'button-start'"
             type="button"
-            :disabled="state === 'requesting' || state === 'loading' || state === 'active'"
-            @click="startCamera"
+            @click="cameraCanStop ? stopCamera() : startCamera()"
           >
-            <span aria-hidden="true">◉</span> Start camera
-          </button>
-          <button
-            class="button button-stop"
-            type="button"
-            :disabled="state !== 'requesting' && state !== 'loading' && state !== 'active'"
-            @click="stopCamera()"
-          >
-            <span aria-hidden="true">■</span> Stop camera
+            <span aria-hidden="true">{{ cameraCanStop ? '■' : '◉' }}</span>
+            {{ cameraCanStop ? 'Stop camera' : 'Start camera' }}
           </button>
         </div>
+        <p v-if="statusDetail" class="status-detail" :role="state === 'error' ? 'alert' : 'status'">{{ statusDetail }}</p>
       </section>
 
+      <AboutDemo />
       <PhotoCredits :scenes="customScenes" />
-      </main>
+    </main>
   </div>
 </template>
