@@ -11,7 +11,6 @@ defineProps<{ scenes: Scene[] }>();
       <span class="credits-chevron" aria-hidden="true">⌄</span>
     </summary>
     <div class="credits-table-wrap">
-      <p class="credits-help">Open a photo link to view the original image on Pexels.</p>
       <table class="credits-table">
         <thead>
           <tr>

@@ -1,6 +1,23 @@
-# Careers Fayre Face Counter
+# Face Counter
 
 A small Vite + Vue 3 browser demo that counts visible faces. The opening screen is a complete camera-off fallback, so the stand can still use the app if the live demo is not ready.
+
+## Visitor interface
+
+- Use **Start camera** to begin. The same button becomes **Stop camera**, including while permission or detector loading is pending. The camera never starts automatically.
+- The off screen says **Camera off**, not that detection is ready. **Ready for the first face** appears only when detection is active and no faces are detected.
+- Expand **Privacy and personal data** for camera processing, retention, consent and Google's separate SDK telemetry. The notice does not claim that all network traffic stays on-device.
+- Expand **AI and the code behind this demo** for the AI explanation, development provenance, source code and process flowcharts.
+- **Built with** is always visible to the left of the camera button, with locally served technology logos separated into this app's tooling and the wider company toolkit. On small screens the button moves below the logos.
+- The Salto logo links to the [XS4 Face product page](https://saltosystems.com/en/products/face-recognition-terminals/xs4-face/). This counting demo does not implement that product's identity recognition.
+
+## AI use and development provenance
+
+The runtime AI is Google's pre-trained BlazeFace full-range face detector, accessed through MediaPipe Tasks Vision. It is a specialist machine-vision neural network, not a large language model (LLM). It locates faces; this app counts its detections and does not identify people.
+
+Development of this program was agent-driven, with strong CI/CD rules and both human and AI review, as reported by the project maintainer. AI coding agents helped create and change the app. The proportion of AI-written code has not been measured; there is no verified percentage to quote. AI assistance does not replace human responsibility, testing or review, and this description is not a claim that any particular CI check has run.
+
+For company discussion, face recognition is an example of machine vision using a specialist neural network rather than an LLM. Keep that separate from this demo's detection-only behaviour. The company toolkit supplied by the maintainer includes Docker, Node.js, JavaScript, Vue, Quasar, Python, Terraform, GitHub, Raspberry Pi, Ubuntu and C++; inclusion here does not mean all are dependencies of this app.
 
 ## How the app is organised
 
@@ -10,6 +27,8 @@ A small Vite + Vue 3 browser demo that counts visible faces. The opening screen 
 - `src/data/scenes.ts` lists each background, its image dimensions, the screen viewport corner positions, and its Pexels photo credits.
 - `src/components/SceneSelector.vue` displays the background choices and tells `App.vue` which one was selected.
 - `src/components/PhotoCredits.vue` displays the expandable Pexels photo credits table.
+- `src/components/AboutDemo.vue` contains expandable privacy, AI/provenance and source-code information.
+- `src/components/BuiltWith.vue` displays the technology logos alongside the camera control.
 - `src/styles.css` contains the shared visual styles and responsive layout rules.
 
 The camera preview is positioned over each background using the viewport corner coordinates in `scenes.ts`. The detector analyses the camera video itself; the displayed preview can be cropped to fit a background without limiting which detected faces contribute to the count.

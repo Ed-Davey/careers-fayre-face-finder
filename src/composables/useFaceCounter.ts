@@ -4,10 +4,10 @@ import { FaceDetector, FilesetResolver } from '@mediapipe/tasks-vision';
 export type AppState = 'standby' | 'requesting' | 'loading' | 'active' | 'error';
 
 const statusCopy: Record<AppState, { title: string; detail: string }> = {
-  standby: { title: 'Camera is off', detail: 'Start the camera when everyone is ready. Nothing is recorded.' },
+  standby: { title: 'Camera off', detail: '' },
   requesting: { title: 'Waiting for permission', detail: 'Allow camera access in your browser to start the live count.' },
   loading: { title: 'Preparing face detection', detail: 'The camera is on. Loading the on-device detector…' },
-  active: { title: 'Camera active · on-device detection', detail: 'Aim the camera at consenting participants. Stop it at any time.' },
+  active: { title: 'Camera active', detail: '' },
   error: { title: 'Camera or detector unavailable', detail: 'The camera is off. The fallback screen is ready.' },
 };
 
@@ -39,12 +39,10 @@ export function useFaceCounter() {
   const countCaption = computed(() => {
     if (state.value === 'requesting') return 'Waiting for camera access';
     if (state.value === 'loading') return 'Getting the counter ready';
-    if (state.value === 'error') return 'Live count paused';
-    if (state.value === 'standby') return 'Ready for the first face';
-    if (faceCount.value === 0) return 'Ready for the first face';
-    if (faceCount.value === 1) return 'First face in view';
-    if (faceCount.value !== null && faceCount.value < 5) return 'Faces are gathering';
-    return 'Look at all these faces';
+    if (state.value === 'error') return 'Camera off. Try again below.';
+    if (state.value === 'standby') return 'Click "Start camera" to begin';
+    if (faceCount.value === null || faceCount.value === 0) return 'Ready for the first face';
+    return 'Detected in the current frame';
   });
 
   function changeState(next: AppState) {
